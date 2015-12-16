@@ -5,29 +5,24 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 object Regression {
-  def linear(xArray: Iterable[Double], yArray: Iterable[Double]) = {
-    val n = xArray.size
-    val nY = yArray.size
-
-    require(n == nY, "Collections must have the same length!")
-
-    val pairs = xArray zip yArray
+  def linear(pairs: IndexedSeq[Seq[Double]]) = {
+    val n = pairs.size
 
     val sums = for {
       sumXi <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + p._1)
+        pairs.foldLeft(0.0)((s, p) => s + p(0))
       }
       sumYi <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + p._2)
+        pairs.foldLeft(0.0)((s, p) => s + p(1))
       }
       sumX2i <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + pow(p._1, 2))
+        pairs.foldLeft(0.0)((s, p) => s + pow(p(0), 2))
       }
       sumY2i <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + pow(p._2, 2))
+        pairs.foldLeft(0.0)((s, p) => s + pow(p(1), 2))
       }
       sumXYi <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + p._1 * p._2)
+        pairs.foldLeft(0.0)((s, p) => s + p(0) * p(1))
       }
 
     } yield (sumXi, sumYi, sumX2i, sumY2i, sumXYi)

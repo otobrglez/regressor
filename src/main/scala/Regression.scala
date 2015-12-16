@@ -5,7 +5,7 @@ object Regression {
     val n = xArray.size
     val nY = yArray.size
 
-    if (n != nY) throw new Exception("Collections must have the same length!")
+    require(n == nY, "Collections must have the same length!")
 
     val pairs = xArray zip yArray
     val sumX = pairs.par.foldLeft(0.0)((s, p) => s + p._1)

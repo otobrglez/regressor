@@ -1,8 +1,13 @@
-import org.scalatest.FlatSpec
+import org.scalatest._
 
 import scala.collection.mutable.ArrayBuffer
 
-class RegressionTest extends FlatSpec {
+class RegressionTest extends FlatSpec with Matchers {
+  it should "cry if collections have different size" in {
+    a[IllegalArgumentException] should be thrownBy {
+      Regression.linear(ArrayBuffer(1, 2), ArrayBuffer(2))
+    }
+  }
 
   it should "do simple regression" in {
     val x = ArrayBuffer(1, 2, 4, 5, 10, 20).map(_.toDouble)

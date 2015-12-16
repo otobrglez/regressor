@@ -9,6 +9,12 @@ class RegressionTest extends FlatSpec with Matchers {
     }
   }
 
+  it should "cry if system has no solution" in {
+    a[AssertionError] should be thrownBy {
+      Regression.linear(ArrayBuffer(0, 0), ArrayBuffer(0, 0))
+    }
+  }
+
   it should "do simple regression" in {
     val x = ArrayBuffer(1, 2, 4, 5, 10, 20).map(_.toDouble)
     val y = ArrayBuffer(4, 6, 12, 15, 34, 68).map(_.toDouble)

@@ -15,7 +15,8 @@ object Regression {
     val sumXY = pairs.par.foldLeft(0.0)((s, p) => s + p._1 * p._2)
 
     val dn = n * sumX2 - pow(sumX, 2)
-    if (dn == 0.0) throw new Exception("Can't solve the system!")
+    assert(dn != 0.0, "Can't solve the system!")
+
 
     val slope = ((n * sumXY) - (sumX * sumY)) / dn
     val intercept = ((sumY * sumX2) - (sumX * sumXY)) / dn

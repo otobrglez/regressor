@@ -10,19 +10,29 @@ object Regression {
 
     val sums = for {
       sumXi <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + p(0))
+        var sum = 0.0
+        for (pair <- pairs) sum += pair(0)
+        sum
       }
       sumYi <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + p(1))
+        var sum = 0.0
+        for (pair <- pairs) sum += pair(1)
+        sum
       }
       sumX2i <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + pow(p(0), 2))
+        var sum = 0.0
+        for (pair <- pairs) sum += pow(pair(0), 2)
+        sum
       }
       sumY2i <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + pow(p(1), 2))
+        var sum = 0.0
+        for (pair <- pairs) sum += pow(pair(1), 2)
+        sum
       }
       sumXYi <- Future {
-        pairs.foldLeft(0.0)((s, p) => s + p(0) * p(1))
+        var sum = 0.0
+        for (pair <- pairs) sum += pair(0) * pair(1)
+        sum
       }
 
     } yield (sumXi, sumYi, sumX2i, sumY2i, sumXYi)

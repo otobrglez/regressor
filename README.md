@@ -6,6 +6,8 @@ Linear and other regressions implemented in Scala.
 
 ## Usage
 
+### Linear regression
+
 ```scala
 val results = Regression.linear(
   IndexedSeq(

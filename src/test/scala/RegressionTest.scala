@@ -1,5 +1,4 @@
 import org.scalatest._
-
 import scala.collection.mutable.ArrayBuffer
 
 class RegressionTest extends FlatSpec with Matchers {
@@ -21,21 +20,20 @@ class RegressionTest extends FlatSpec with Matchers {
         Seq(20, 68)
       )
     )
-    assert(results._1.formatted("%2.2f") == "3.44")
+
+		assert(results._1.formatted("%2.2f") == "3.44")
     assert(results._2.formatted("%2.2f") == "-0.89")
     assert(results._3.formatted("%2.3f") == "0.998")
   }
 
-  it should "do regression from file" in {
+  it should "work from file" in {
     val fileName = "src/test/resources/data/numbers_simple.csv"
     val results = Regression.linear(io.Source.fromFile(fileName)
       .getLines
       .map(_.split(",")
-        .map(_.trim)
-        .map(_.toDouble)
-        .to[collection.immutable.Seq]
+        .map(_.toDouble).to[collection.immutable.Seq]
       ).toIndexedSeq)
 
-    println(results)
+    assert(results._1.formatted("%2.2f") == "3.44")
   }
 }

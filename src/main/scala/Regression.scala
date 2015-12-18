@@ -1,5 +1,5 @@
 import scala.concurrent.duration.Duration
-import scala.math.{pow}
+import scala.math.{pow, sqrt}
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -106,6 +106,24 @@ object Regression {
     val (sumX, sumY, sumXY, sumXSq) = Await.result(pro, Duration.Inf)
     val m = (sumXY - sumX * sumY / n) / (sumXSq - sumX * sumX / n)
     val b = sumY / n - m * sumX / n
-    (m, b)
+
+    // Errors
+    var sum = 0.0
+    for (pair <- pairs) {
+      sum += (pair(1) - b - m * pair(0)) *
+        (pair(1) - b - m * pair(0))
+
+      // (Y[j] - ret.b - ret.m*X[j]) * (Y[j] - ret.b - ret.m*X[j])
+    }
+
+    val delta = n * sumXSq - pow(sumX, 2)
+    val vari = 1.0 / (n - 2.0) * sum
+    val b_err = sqrt(vari / delta * sumXSq)
+
+    val m_err = sqrt(n / delta * vari)
+
+    (m, b, m_err, b_err, (x: Double) => {
+      m * x + b
+    })
   }
 }

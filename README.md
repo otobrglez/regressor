@@ -47,9 +47,14 @@ val results = Regression.leastSquares(
   
 println(results)
 
-// _1 => 1.40 (m) 
-// _2 => 3.50 (b)
-// y = mx + b
+// _1 => slope
+// _2 => intercept
+// _3 => slope error
+// _4 => intercept error
+// _5 => function for computing errors
+ 
+// Linear function:
+// y = slope*x - intercept
 
 ```
 

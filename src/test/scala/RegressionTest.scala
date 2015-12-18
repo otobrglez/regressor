@@ -21,7 +21,7 @@ class RegressionTest extends FlatSpec with Matchers {
       )
     )
 
-		assert(results._1.formatted("%2.2f") == "3.44")
+    assert(results._1.formatted("%2.2f") == "3.44")
     assert(results._2.formatted("%2.2f") == "-0.89")
     assert(results._3.formatted("%2.3f") == "0.998")
   }

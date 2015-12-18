@@ -33,6 +33,34 @@ println(results)
 
 See [tests](src/test/scala) for more examples.
 
+### Least Squares
+
+```scala
+val results = Regression.leastSquares(
+  IndexedSeq(
+    Seq(1, 6),
+    Seq(2, 5),
+    Seq(3, 7),
+    Seq(4, 10)
+  )
+)
+  
+println(results)
+
+// _1 => 1.40 (m) 
+// _2 => 3.50 (b)
+// y = mx + b
+
+```
+
+## Test suite
+
+    sbt test
+    sbt "~test"
+    sbt "~test-only RegressionTest"
+
+See [tests](src/test/scala) suite.
+
 ## Author
 
 - [Oto Brglez](https://github.com/otobrglez)

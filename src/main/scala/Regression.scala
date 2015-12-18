@@ -68,4 +68,44 @@ object Regression {
     else
       (slope, intercept, 0.0)
   }
+
+  def leastSquares(pairs: IndexedSeq[Seq[Double]]) = {
+    val n = pairs.size
+
+    val pro = for {
+      sumXi <- Future {
+        var sum = 0.0
+        for (pair <- pairs) {
+          sum += pair(0)
+        }
+        sum
+      }
+      sumYi <- Future {
+        var sum = 0.0
+        for (pair <- pairs) {
+          sum += pair(1)
+        }
+        sum
+      }
+      sumXYi <- Future {
+        var sum = 0.0
+        for (pair <- pairs) {
+          sum += pair(0) * pair(1)
+        }
+        sum
+      }
+      sumXSqi <- Future {
+        var sum = 0.0
+        for (pair <- pairs) {
+          sum += pow(pair(0), 2)
+        }
+        sum
+      }
+    } yield (sumXi, sumYi, sumXYi, sumXSqi)
+
+    val (sumX, sumY, sumXY, sumXSq) = Await.result(pro, Duration.Inf)
+    val m = (sumXY - sumX * sumY / n) / (sumXSq - sumX * sumX / n)
+    val b = sumY / n - m * sumX / n
+    (m, b)
+  }
 }

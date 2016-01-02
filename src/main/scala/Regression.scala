@@ -8,33 +8,42 @@ object Regression {
   def linear(pairs: IndexedSeq[Seq[Double]]) = {
     val n = pairs.size
 
-    val sums = for {
-      sumXi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) sum += pair(0)
-        sum
-      }
-      sumYi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) sum += pair(1)
-        sum
-      }
-      sumX2i <- Future {
-        var sum = 0.0
-        for (pair <- pairs) sum += pow(pair(0), 2)
-        sum
-      }
-      sumY2i <- Future {
-        var sum = 0.0
-        for (pair <- pairs) sum += pow(pair(1), 2)
-        sum
-      }
-      sumXYi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) sum += pair(0) * pair(1)
-        sum
-      }
+    val fSumI = Future {
+      var sum = 0.0
+      for (pair <- pairs) sum += pair(0)
+      sum
+    }
 
+    val fSumXi = Future {
+      var sum = 0.0
+      for (pair <- pairs) sum += pair(1)
+      sum
+    }
+
+    val fSumX2i = Future {
+      var sum = 0.0
+      for (pair <- pairs) sum += pow(pair(0), 2)
+      sum
+    }
+
+    val fSumY2i = Future {
+      var sum = 0.0
+      for (pair <- pairs) sum += pow(pair(1), 2)
+      sum
+    }
+
+    val fSumXYi = Future {
+      var sum = 0.0
+      for (pair <- pairs) sum += pair(0) * pair(1)
+      sum
+    }
+
+    val sums = for {
+      sumXi <- fSumI
+      sumYi <- fSumXi
+      sumX2i <- fSumX2i
+      sumY2i <- fSumY2i
+      sumXYi <- fSumXYi
     } yield (sumXi, sumYi, sumX2i, sumY2i, sumXYi)
 
     val (sumX, sumY, sumX2, sumY2, sumXY) = Await.result(sums, Duration.Inf)
@@ -42,22 +51,32 @@ object Regression {
     val dn = n * sumX2 - pow(sumX, 2)
     assert(dn != 0.0, "Can't solve the system!")
 
+    val fSlopei = Future {
+      ((n * sumXY) - (sumX * sumY)) / dn
+    }
+
+    val fIntercepti = Future {
+      ((sumY * sumX2) - (sumX * sumXY)) / dn
+    }
+
+    val fT1i = Future {
+      ((n * sumXY) - (sumX * sumY)) * ((n * sumXY) - (sumX * sumY))
+    }
+
+    val fT2i = Future {
+      (n * sumX2) - pow(sumX, 2)
+    }
+
+    val fT31 = Future {
+      (n * sumY2) - pow(sumY, 2)
+    }
+
     val poms = for {
-      slopei <- Future {
-        ((n * sumXY) - (sumX * sumY)) / dn
-      }
-      intercepti <- Future {
-        ((sumY * sumX2) - (sumX * sumXY)) / dn
-      }
-      t1i <- Future {
-        ((n * sumXY) - (sumX * sumY)) * ((n * sumXY) - (sumX * sumY))
-      }
-      t2i <- Future {
-        (n * sumX2) - pow(sumX, 2)
-      }
-      t31 <- Future {
-        (n * sumY2) - pow(sumY, 2)
-      }
+      slopei <- fSlopei
+      intercepti <- fIntercepti
+      t1i <- fT1i
+      t2i <- fT2i
+      t31 <- fT31
 
     } yield (slopei, intercepti, t1i, t2i, t31)
 
@@ -72,35 +91,43 @@ object Regression {
   def leastSquares(pairs: IndexedSeq[Seq[Double]]) = {
     val n = pairs.size
 
+    val fSumXi = Future {
+      var sum = 0.0
+      for (pair <- pairs) {
+        sum += pair(0)
+      }
+      sum
+    }
+
+    val fSumYi = Future {
+      var sum = 0.0
+      for (pair <- pairs) {
+        sum += pair(1)
+      }
+      sum
+    }
+
+    val fSumXYi = Future {
+      var sum = 0.0
+      for (pair <- pairs) {
+        sum += pair(0) * pair(1)
+      }
+      sum
+    }
+
+    val fSumXSqi = Future {
+      var sum = 0.0
+      for (pair <- pairs) {
+        sum += pow(pair(0), 2)
+      }
+      sum
+    }
+
     val pro = for {
-      sumXi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) {
-          sum += pair(0)
-        }
-        sum
-      }
-      sumYi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) {
-          sum += pair(1)
-        }
-        sum
-      }
-      sumXYi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) {
-          sum += pair(0) * pair(1)
-        }
-        sum
-      }
-      sumXSqi <- Future {
-        var sum = 0.0
-        for (pair <- pairs) {
-          sum += pow(pair(0), 2)
-        }
-        sum
-      }
+      sumXi <- fSumXi
+      sumYi <- fSumYi
+      sumXYi <- fSumXYi
+      sumXSqi <- fSumXSqi
     } yield (sumXi, sumYi, sumXYi, sumXSqi)
 
     val (sumX, sumY, sumXY, sumXSq) = Await.result(pro, Duration.Inf)
@@ -112,8 +139,6 @@ object Regression {
     for (pair <- pairs) {
       sum += (pair(1) - b - m * pair(0)) *
         (pair(1) - b - m * pair(0))
-
-      // (Y[j] - ret.b - ret.m*X[j]) * (Y[j] - ret.b - ret.m*X[j])
     }
 
     val delta = n * sumXSq - pow(sumX, 2)

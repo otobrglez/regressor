@@ -8,35 +8,11 @@ object Regression {
   def linear(pairs: IndexedSeq[Seq[Double]]) = {
     val n = pairs.size
 
-    val fSumI = Future {
-      var sum = 0.0
-      for (pair <- pairs) sum += pair(0)
-      sum
-    }
-
-    val fSumXi = Future {
-      var sum = 0.0
-      for (pair <- pairs) sum += pair(1)
-      sum
-    }
-
-    val fSumX2i = Future {
-      var sum = 0.0
-      for (pair <- pairs) sum += pow(pair(0), 2)
-      sum
-    }
-
-    val fSumY2i = Future {
-      var sum = 0.0
-      for (pair <- pairs) sum += pow(pair(1), 2)
-      sum
-    }
-
-    val fSumXYi = Future {
-      var sum = 0.0
-      for (pair <- pairs) sum += pair(0) * pair(1)
-      sum
-    }
+    val fSumI = Future(pairs.map(x => x(0)).sum)
+    val fSumXi = Future(pairs.map(x => x(1)).sum)
+    val fSumX2i = Future(pairs.map(x => pow(x(0), 2)).sum)
+    val fSumY2i = Future(pairs.map(x => pow(x(1), 2)).sum)
+    val fSumXYi = Future(pairs.map(x => x(0) * x(1)).sum)
 
     val sums = for {
       sumXi <- fSumI
@@ -91,37 +67,10 @@ object Regression {
   def leastSquares(pairs: IndexedSeq[Seq[Double]]) = {
     val n = pairs.size
 
-    val fSumXi = Future {
-      var sum = 0.0
-      for (pair <- pairs) {
-        sum += pair(0)
-      }
-      sum
-    }
-
-    val fSumYi = Future {
-      var sum = 0.0
-      for (pair <- pairs) {
-        sum += pair(1)
-      }
-      sum
-    }
-
-    val fSumXYi = Future {
-      var sum = 0.0
-      for (pair <- pairs) {
-        sum += pair(0) * pair(1)
-      }
-      sum
-    }
-
-    val fSumXSqi = Future {
-      var sum = 0.0
-      for (pair <- pairs) {
-        sum += pow(pair(0), 2)
-      }
-      sum
-    }
+    val fSumXi = Future(pairs.map(x => x(0)).sum)
+    val fSumYi = Future(pairs.map(x => x(1)).sum)
+    val fSumXYi = Future(pairs.map(x => x(0) * x(1)).sum)
+    val fSumXSqi = Future(pairs.map(x => pow(x(0), 2)).sum)
 
     val pro = for {
       sumXi <- fSumXi
